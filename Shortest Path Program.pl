@@ -13,8 +13,8 @@ inizia:-
     format('\t\t\t\t\t\t\t\t\033[1mBenvenuto, nel programma di calcolo del percorso minimo.\033[0m'),
     nl,
     nl,
-    write('Qui puoi inserire le coordinate X ed Y degli ostacoli e le coordinate X ed Y del trofeo.
-    Il programma calcolerà il percorso minimo per raggiungere il trofeo dalla posizione (0,0).'), nl,
+    write('\t\t\t\t\t\t\tQui puoi inserire le coordinate X ed Y degli ostacoli e le coordinate X ed Y del trofeo.
+\t\t\t\t\t\t\tIl programma calcolerà il percorso minimo per raggiungere il trofeo dalla posizione (0,0).'), nl,
     nl,
     quanti_ostacoli.
 
@@ -110,6 +110,7 @@ add_length([Path | Paths], [Length - Path | Res]) :-
     path_length(Path, Length),
     add_length(Paths, Res).
 
+
 % Frase di output
 frase_output(MinPath, Length, Paths) :-
    nl,
@@ -120,15 +121,19 @@ frase_output(MinPath, Length, Paths) :-
    write(', di lunghezza: '), write(Length).
 
 
-
 % caso base: una lista vuota ha 0 elementi
 num_elementi([], 0).
-num_elementi([_|T], N) :- num_elementi(T, N1), N is N1 + 1.
+num_elementi([_|T], N) :-
+    num_elementi(T, N1), N is N1 + 1.
 
 
 scrivi([]).
 scrivi([H|T]) :-
     nl, write(H),  nl,  scrivi(T).
+
+
+
+
 
 
 trova_min_path(Paths, MinPath, Length) :-
@@ -137,15 +142,19 @@ trova_min_path(Paths, MinPath, Length) :-
     frase_output(MinPath, Length, Paths).
 
 
-min_lista([], Min, Min).
+
 
 min_lista([Length1-Path1 | Tail], Min) :-
     min_lista(Tail, Length1-Path1, Min).
+
+min_lista([], Min, Min).
 
 min_lista([Length-Path | Tail], Length1-Path1, Min) :-
     ( Length < Length1 -> min_lista(Tail, Length-Path, Min);
     min_lista(Tail, Length1-Path1, Min)
      ).
+
+
 
 
 
