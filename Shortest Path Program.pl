@@ -94,31 +94,36 @@ show_path(X,Y,P) :-
       nl,
       inizia,
       nl;
-    find_min_path(Paths, MinPath, Length)
+    trova_min_path(Paths, MinPath, Length)
     ).
 
 
-% un solo nodo (X, Y) ha lunghezza 0
+% una lista vuota ha lunghezza 0
 
 path_length([], 0).
 path_length([ _ | T], Length) :-
-    path_length(T, Rest), Length is Rest + 1.
+    path_length(T, Resto), Length is Resto + 1.
 
 
 add_length([], []).
-add_length([Path | Paths], [Length - Path | Result]) :-
+add_length([Path | Paths], [Length - Path | Res]) :-
     path_length(Path, Length),
-    add_length(Paths, Result).
+    add_length(Paths, Res).
 
 % Frase di output
-output_phrase(MinPath, Length, Paths) :-
+frase_output(MinPath, Length, Paths) :-
    nl,
-   write('Questi sono tutti i possibili percorsi: '), nl,
+   num_elementi(Paths, Lunghezza),
+   write('Sono stati trovati '), write(Lunghezza), write(' possibili percorsi: '), nl,
    scrivi(Paths), nl,
    write('Il percorso minimo è: '), write(MinPath),
-   write(', di lunghezza: '), write(Length), nl,
-   num_elementi(Paths, Lunghezza),
-   print(Lunghezza).
+   write(', di lunghezza: '), write(Length).
+
+
+
+% caso base: una lista vuota ha 0 elementi
+num_elementi([], 0).
+num_elementi([_|T], N) :- num_elementi(T, N1), N is N1 + 1.
 
 
 scrivi([]).
@@ -126,20 +131,20 @@ scrivi([H|T]) :-
     nl, write(H),  nl,  scrivi(T).
 
 
-find_min_path(Paths, MinPath, Length) :-
+trova_min_path(Paths, MinPath, Length) :-
     add_length(Paths, PathsWithLength),
-    min_of_list(PathsWithLength, Length-MinPath),
-    output_phrase(MinPath, Length, Paths).
+    min_lista(PathsWithLength, Length-MinPath),
+    frase_output(MinPath, Length, Paths).
 
 
-min_of_list([], Min, Min).
+min_lista([], Min, Min).
 
-min_of_list([Length1-Path1 | Tail], Min) :-
-    min_of_list(Tail, Length1-Path1, Min).
+min_lista([Length1-Path1 | Tail], Min) :-
+    min_lista(Tail, Length1-Path1, Min).
 
-min_of_list([Length-Path | Tail], Length1-Path1, Min) :-
-    ( Length < Length1 -> min_of_list(Tail, Length-Path, Min);
-    min_of_list(Tail, Length1-Path1, Min)
+min_lista([Length-Path | Tail], Length1-Path1, Min) :-
+    ( Length < Length1 -> min_lista(Tail, Length-Path, Min);
+    min_lista(Tail, Length1-Path1, Min)
      ).
 
 
