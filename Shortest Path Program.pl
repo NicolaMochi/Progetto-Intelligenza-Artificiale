@@ -39,7 +39,7 @@ inserisci_ostacoli(N) :-
     format('\033[1mY:\033[0m'), % per scrivere x in grassetto
     read(Y),
     ( integer(X), integer(Y), X >= 0, Y >= 0 ->
-        ( ostacolo((X,Y)) -> write("Attenzione! L'ostacolo esiste già! "),
+        ( ostacolo((X,Y)) -> nl, write("Attenzione! L'ostacolo esiste già! "), nl,
         inserisci_ostacoli(N) ;
         assertz(ostacolo((X,Y))),
         nl,
@@ -113,26 +113,37 @@ add_length([Path | Paths], [Length - Path | Res]) :-
 
 % Frase di output
 frase_output(MinPath, Length, Paths) :-
-   nl,
-   num_elementi(Paths, Lunghezza),
-   write('Sono stati trovati '), write(Lunghezza), write(' possibili percorsi: '), nl,
-   scrivi(Paths), nl,
-   write('Il percorso minimo è: '), write(MinPath),
-   write(', di lunghezza: '), write(Length).
+    nl,
+    write('Vuoi mostrare tutti i possibili percorsi? (y/n)'),
+    read(Risposta),
+    (
+        (   Risposta == y )  ->  nl,
+        path_length(Paths, Lunghezza),
+        write('Sono stati trovati '), write(Lunghezza), write(' possibili percorsi: '), nl,
+        scrivi(Paths), nl,
+        write('Il percorso minimo è: '), write(MinPath),
+        write(', di lunghezza: '), write(Length),
+        nl,
+        write('Il numero di percorsi totali è: '), write(Lunghezza);
+
+        (   Risposta == n )  ->
+        nl,
+        write('Il percorso minimo è: '), write(MinPath),
+        write(', di lunghezza: '), write(Length),
+        nl,
+        path_length(Paths, Lunghezza),
+        write('Il numero di percorsi totali è: '), write(Lunghezza);
+
+        write('Risposta non valida. Inserire y o n.'), nl,
+        frase_output(MinPath, Length, Paths)
+    ).
 
 
-% caso base: una lista vuota ha 0 elementi
-num_elementi([], 0).
-num_elementi([_|T], N) :-
-    num_elementi(T, N1), N is N1 + 1.
 
 
 scrivi([]).
 scrivi([H|T]) :-
     nl, write(H),  nl,  scrivi(T).
-
-
-
 
 
 
@@ -167,6 +178,7 @@ max([X|T],N):- max(T,N).
 % perche deve essere lanciata questa solo all avvio ma ci servono
 % massimox e y e altrimenti ongi volta che riparte parte inserisci archi
 
+
 max_coordinate1(MaxX, MaxY,L) :-
     findall(X, ostacolo((X, _)), XOstacoli),
     findall(Y, ostacolo((_, Y)), YOstacoli),
@@ -192,6 +204,10 @@ max_coordinate(MaxX, MaxY) :-
 
 
 
+
+
+
+
 limite(X, Y) :-
   max_coordinate(MaxX, MaxY),
   X =< MaxX,
@@ -213,23 +229,45 @@ inserisci_archi(MaxX, MaxY, L) :-
                      go(L) ; true))).
 
 
-
 go(L):-
     trofeo((X, Y)),
     Z = (X, Y),
     show_path((0,0), Z, L).
 
 crea_edge(X, Y) :-
+    X1 is X+1, Y1 is Y,limite(X1,Y1), positivo(X1,Y1),assert(edge((X, Y), (X1, Y1)));
+    X2 is X, Y2 is Y+1, limite(X2,Y2), positivo(X2,Y2), assert(edge((X, Y), (X2, Y2)));
+    X3 is X-1, Y3 is Y, limite(X3,Y3), positivo(X3,Y3),  assert(edge((X, Y), (X3, Y3)));
+    X4 is X, Y4 is Y-1, limite(X4,Y4), positivo(X4,Y4),  assert(edge((X, Y), (X4, Y4))).
 
- X = Y, limite(X,Y) -> ( X1 is X+1, Y1 is Y,limite(X1,Y1), positivo(X1,Y1),assert(edge((X, Y), (X1, Y1)));
-                         X2 is X, Y2 is Y+1, limite(X2,Y2), positivo(X2,Y2), assert(edge((X, Y), (X2, Y2)));
-                         X3 is X-1, Y3 is Y, limite(X3,Y3), positivo(X3,Y3),  assert(edge((X, Y), (X3, Y3)));
-                         X4 is X, Y4 is Y-1, limite(X4,Y4), positivo(X4,Y4),  assert(edge((X, Y), (X4, Y4))));
 
- X \= Y, limite(X,Y) -> (X1 is X+1, Y1 is Y, limite(X1,Y1), positivo(X1,Y1),  assert(edge((X, Y), (X1, Y1)));
-                         X2 is X, Y2 is Y-1, limite(X2,Y2), positivo(X2,Y2), assert(edge((X, Y), (X2, Y2)));
-                         X3 is X-1, Y3 is Y, limite(X3,Y3), positivo(X3,Y3),  assert(edge((X, Y), (X3, Y3)));
-                         X4 is X, Y4 is Y+1, limite(X4,Y4), positivo(X4,Y4),  assert(edge((X, Y), (X4, Y4)))).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
